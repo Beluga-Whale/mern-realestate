@@ -1,0 +1,26 @@
+{
+    "name": "mern-realestate",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "dev": "nodemon api/index.js",
+        "start": "node api/index.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Beluga-Whale/mern-realestate.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/Beluga-Whale/mern-realestate/issues"
+    },
+    "homepage": "https://github.com/Beluga-Whale/mern-realestate#readme",
+    "dependencies": {
+        "express": "^4.18.2",
+        "nodemon": "^3.0.1"
+    }
+}
