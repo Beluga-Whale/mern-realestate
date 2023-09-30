@@ -1,8 +1,12 @@
 import express from 'express'
 import mongoose from 'mongoose'
+import morgan from 'morgan'
 import dotenv from 'dotenv'
 dotenv.config()
 import userRouter from './routes/userRoutes.js'
+import authRouter from './routes/authRoutes.js'
+
+const app = express()
 
 mongoose.connect(process.env.MONGO_URI).then(() => {
     console.log('Connected to MongoDB');
@@ -11,10 +15,14 @@ mongoose.connect(process.env.MONGO_URI).then(() => {
     console.log(err);
 })
 
-const app = express()
+
+app.use(morgan('dev'))
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
 
 app.use('/api/user', userRouter)
+app.use('/api/auth', authRouter)
 
 
 app.listen(3000, () => {
