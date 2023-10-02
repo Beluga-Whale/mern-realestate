@@ -22,7 +22,7 @@ const SignUp = () => {
             setError(null);
             navigate('/sign-in');
         } catch (err: any) {
-            setError(err.message);
+            setError(err.response.data.message);
             setLoading(false);
             return;
         }
