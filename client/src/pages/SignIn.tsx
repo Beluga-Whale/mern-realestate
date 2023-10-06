@@ -1,12 +1,14 @@
-import axios from 'axios';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../store';
+import { loginUser, userSelector } from '../store/user/userSlice';
 
 const SignIn = () => {
-    const [formData, setFormData] = useState<object | null>({});
-    const [error, setError] = useState<string | null>(null);
-    const [loading, setLoading] = useState<boolean>(false);
+    const [formData, setFormData] = useState<object>({});
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+
+    const { error, loading } = useAppSelector(userSelector);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({
@@ -16,19 +18,15 @@ const SignIn = () => {
     };
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
         try {
-            await axios.post('/api/auth/signin', formData);
-            setError(null);
-            navigate('/');
+            const action = await dispatch(loginUser(formData));
+            const type = action.type.split('/');
+            if (type[2] === 'fulfilled') {
+                navigate('/');
+            }
         } catch (err: any) {
-            console.log(err);
-
-            setError(err.response.data.message);
-            setLoading(false);
             return;
         }
-        setLoading(false);
     };
 
     return (
