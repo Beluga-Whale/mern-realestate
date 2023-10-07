@@ -2,6 +2,8 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { RootState } from '..';
 import { useNavigate } from 'react-router-dom';
+import { GoogleAuthProvider, getAuth, signInWithPopup } from 'firebase/auth';
+import { app } from '../../firebase';
 
 export const loginUser = createAsyncThunk(
     'user/loginUser',
@@ -17,16 +19,42 @@ export const loginUser = createAsyncThunk(
     }
 );
 
+export const loginWithGoogle = createAsyncThunk(
+    'user/loginWithGoogle',
+    async (_, thunkAPI) => {
+        try {
+            const provider = new GoogleAuthProvider();
+            const auth = getAuth(app);
+
+            const result = await signInWithPopup(auth, provider);
+            console.log('GOOGLE', result.user);
+            await axios.post('/api/auth/google', {
+                name: result.user.displayName,
+                email: result.user.email,
+                photo: result.user.photoURL,
+            });
+            window.closed;
+            return result.user;
+        } catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response.data.message);
+        }
+    }
+);
+
 type UserState = {
-    currentUser: object | null;
+    currentUserDatabase: object | null;
+    currentUserGoogle: object | null;
     error: any;
     loading: boolean;
+    loginMethod: 'database' | 'google' | null;
 };
 
 const initialState: UserState = {
-    currentUser: null,
+    currentUserDatabase: null,
+    currentUserGoogle: null,
     error: null,
     loading: false,
+    loginMethod: null,
 };
 
 const userSlice = createSlice({
@@ -36,11 +64,13 @@ const userSlice = createSlice({
     extraReducers: builder => {
         builder.addCase(loginUser.pending, state => {
             state.loading = true;
+            state.loginMethod = 'database';
         });
         builder.addCase(
             loginUser.fulfilled,
             (state, action: PayloadAction<object>) => {
-                state.currentUser = action.payload;
+                state.currentUserDatabase = action.payload;
+                state.currentUserGoogle = null;
                 state.loading = false;
                 state.error = null;
             }
@@ -50,6 +80,28 @@ const userSlice = createSlice({
             (state, action: PayloadAction<any>) => {
                 state.error = action.payload;
                 state.loading = false;
+                state.loginMethod = null;
+            }
+        );
+        builder.addCase(loginWithGoogle.pending, state => {
+            state.loading = true;
+            state.loginMethod = 'google';
+        });
+        builder.addCase(
+            loginWithGoogle.fulfilled,
+            (state, action: PayloadAction<any>) => {
+                state.currentUserGoogle = action.payload;
+                state.currentUserDatabase = null;
+                state.loading = false;
+                state.error = null;
+            }
+        );
+        builder.addCase(
+            loginWithGoogle.rejected,
+            (state, action: PayloadAction<any>) => {
+                state.error = action.payload;
+                state.loading = false;
+                state.loginMethod = null;
             }
         );
     },
