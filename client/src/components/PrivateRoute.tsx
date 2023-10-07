@@ -4,7 +4,6 @@ import { Outlet, Navigate } from 'react-router-dom';
 
 const PrivateRoute = () => {
     const user = useAppSelector(userSelector);
-    console.log(user);
 
     return (
         <>
