@@ -9,27 +9,56 @@ export const test = (req, res) => {
 }
 
 export const updateUser = async (req, res, next) => {
-    if (req.user.id !== req.params.id) {
-        return next(errorHandler(401, "You can only update own you account"))
-    }
+    if (req.user.id !== req.params.id)
+        return next(errorHandler(401, 'You can only update your own account!'));
     try {
         if (req.body.password) {
-            req.body.password = bcryptjs.hashSync(req.body.password, 10)
+            req.body.password = bcryptjs.hashSync(req.body.password, 10);
         }
+        console.log("Req body", req.body);
+        const updatedUser = await User.findByIdAndUpdate(
+            req.params.id,
+            {
+                $set: {
+                    username: req.body.username,
+                    email: req.body.email,
+                    password: req.body.password,
+                    avatar: req.body.avatar,
+                },
+            },
+            { new: true }
+        );
 
-        const updatedUser = await User.findByIdAndUpdate(req.params.id, {
-            $set: {
-                username: req.body.username,
-                email: req.body.email,
-                password: req.body.password,
-                avatar: req.body.avatar
-            }
-        }, { new: true })
+        const { password: pass, ...rest } = updatedUser._doc;
 
-        const { password, ...rest } = updatedUser._doc
-        res.status(200).json(rest)
-    } catch (err) {
-        next(err)
+        res.status(200).json(rest);
+    } catch (error) {
+        next(error);
     }
-}
+};
+
+// export const updateUser = async (req, res, next) => {
+//     if (req.user.id !== req.params.id) {
+//         return next(errorHandler(401, "You can only update own you account"))
+//     }
+//     try {
+//         if (req.body.password) {
+//             req.body.password = bcryptjs.hashSync(req.body.password, 10)
+//         }
+
+//         const updatedUser = await User.findByIdAndUpdate(req.params.id, {
+//             $set: {
+//                 username: req.body.username,
+//                 email: req.body.email,
+//                 password: req.body.password,
+//                 avatar: req.body.avatar
+//             }
+//         }, { new: true })
+
+//         const { password: pass, ...rest } = updatedUser._doc
+//         res.status(200).json(rest)
+//     } catch (err) {
+//         next(err)
+//     }
+// }
 

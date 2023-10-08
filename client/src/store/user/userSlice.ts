@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { RootState } from '..';
-import { useNavigate } from 'react-router-dom';
+
 import { GoogleAuthProvider, getAuth, signInWithPopup } from 'firebase/auth';
 import { app } from '../../firebase';
 
@@ -35,6 +35,19 @@ export const loginWithGoogle = createAsyncThunk(
             });
             window.closed;
             return result.user;
+        } catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response.data.message);
+        }
+    }
+);
+
+export const updateUser = createAsyncThunk(
+    'user/updateUser',
+    async ({ formData, id }: { formData: object; id: string }, thunkAPI) => {
+        try {
+            const res = await axios.put(`/api/user/update/${id}`, formData);
+
+            return res.data;
         } catch (err: any) {
             return thunkAPI.rejectWithValue(err.response.data.message);
         }
@@ -98,6 +111,27 @@ const userSlice = createSlice({
         );
         builder.addCase(
             loginWithGoogle.rejected,
+            (state, action: PayloadAction<any>) => {
+                state.error = action.payload;
+                state.loading = false;
+                state.loginMethod = null;
+            }
+        );
+        builder.addCase(updateUser.pending, state => {
+            state.loading = true;
+            state.loginMethod = 'database';
+        });
+        builder.addCase(
+            updateUser.fulfilled,
+            (state, action: PayloadAction<any>) => {
+                state.currentUserDatabase = action.payload;
+                state.currentUserGoogle = null;
+                state.loading = false;
+                state.error = null;
+            }
+        );
+        builder.addCase(
+            updateUser.rejected,
             (state, action: PayloadAction<any>) => {
                 state.error = action.payload;
                 state.loading = false;

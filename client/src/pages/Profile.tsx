@@ -1,5 +1,5 @@
-import { useAppSelector } from '../store';
-import { userSelector } from '../store/user/userSlice';
+import { useAppSelector, useAppDispatch } from '../store';
+import { updateUser, userSelector } from '../store/user/userSlice';
 import React, { useRef, useState, useEffect } from 'react';
 import {
     getDownloadURL,
@@ -9,38 +9,33 @@ import {
 } from 'firebase/storage';
 import { app } from '../firebase';
 
-type User = {
+export type User = {
     currentUserGoogle?: {
         photoURL?: string;
+        displayName?: string;
+        email?: string;
     };
     currentUserDatabase?: any;
-};
-
-type Form = {
-    username: string;
-    email: string;
-    password: string;
-    avatar: string;
+    loading: boolean;
+    error: string;
 };
 
 const Profile = () => {
     const fileRef = useRef<HTMLInputElement | null>(null);
-    const user: User = useAppSelector(userSelector) as User;
     const [file, setFile] = useState<File | undefined>(undefined);
     const [filePercent, setFilePercent] = useState<number>(0);
     const [fileUpLoadError, setFileUpLoadError] = useState<boolean>(false);
-    const [formData, setFormData] = useState<Form>({
-        username: '',
-        email: '',
-        password: '',
-        avatar: '',
-    });
+    const [updateSuccess, setUpdateSuccess] = useState(false);
+    const [formData, setFormData] = useState<any>({});
+    const user: User = useAppSelector(userSelector) as User;
+    const dispatch = useAppDispatch();
 
     useEffect(() => {
         if (file) {
             handleFileUpload(file);
         }
     }, [file]);
+
     const handleFileUpload = (file: File) => {
         const storage = getStorage(app);
         const fileName = new Date().getTime() + file.name;
@@ -65,11 +60,36 @@ const Profile = () => {
         );
     };
 
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({ ...formData, [e.target.id]: e.target.value });
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        console.log('id', user.currentUserDatabase._id);
+
+        try {
+            dispatch(
+                updateUser({
+                    formData,
+                    id: user.currentUserDatabase._id,
+                })
+            );
+            setUpdateSuccess(true);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const checkIsLoginGoogle = user.currentUserGoogle !== null;
+    console.log('checkIsLoginGoogle', checkIsLoginGoogle);
+
     return (
         <div className="p-3 max-w-lg mx-auto">
             <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
-            <form className="flex flex-col gap-4">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                 <input
+                    disabled={checkIsLoginGoogle}
                     onChange={e => {
                         setFile(e.target.files?.[0]);
                     }}
@@ -106,22 +126,39 @@ const Profile = () => {
                     type="text"
                     placeholder="username"
                     id="username"
+                    defaultValue={
+                        user?.currentUserGoogle?.displayName ||
+                        user?.currentUserDatabase?.username
+                    }
                     className="border p-3 rounded-lg"
+                    onChange={handleChange}
+                    readOnly={checkIsLoginGoogle}
                 />
                 <input
                     type="text"
                     placeholder="email"
                     id="email"
+                    defaultValue={
+                        user?.currentUserGoogle?.email ||
+                        user?.currentUserDatabase?.email
+                    }
                     className="border p-3 rounded-lg"
+                    onChange={handleChange}
+                    readOnly={checkIsLoginGoogle}
                 />
                 <input
-                    type="text"
+                    type="password"
                     placeholder="password"
                     id="password"
                     className="border p-3 rounded-lg"
+                    onChange={handleChange}
+                    readOnly={checkIsLoginGoogle}
                 />
-                <button className="bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80">
-                    update
+                <button
+                    disabled={user.loading}
+                    className="bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80"
+                >
+                    {user.loading ? 'Loading...' : 'Update'}
                 </button>
             </form>
             <div className="flex justify-between mt-5">
@@ -130,6 +167,12 @@ const Profile = () => {
                 </span>
                 <span className="text-red-700 cursor-pointer">Sign out</span>
             </div>
+            <p className="text-red-700 mt-5">
+                {user.error ? <span>{user.error}</span> : ''}
+            </p>
+            <p className="text-green-700 mt-5">
+                {updateSuccess ? 'Success' : ''}
+            </p>
         </div>
     );
 };
