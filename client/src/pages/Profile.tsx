@@ -1,5 +1,10 @@
 import { useAppSelector, useAppDispatch } from '../store';
-import { deleteUser, updateUser, userSelector } from '../store/user/userSlice';
+import {
+    deleteUser,
+    signOutUser,
+    updateUser,
+    userSelector,
+} from '../store/user/userSlice';
 import React, { useRef, useState, useEffect } from 'react';
 import {
     getDownloadURL,
@@ -8,6 +13,7 @@ import {
     uploadBytesResumable,
 } from 'firebase/storage';
 import { app } from '../firebase';
+import axios from 'axios';
 
 export type User = {
     currentUserGoogle?: {
@@ -28,6 +34,8 @@ const Profile = () => {
     const [updateSuccess, setUpdateSuccess] = useState(false);
     const [formData, setFormData] = useState<any>({});
     const user: User = useAppSelector(userSelector) as User;
+    const checkIsLoginGoogle = user.currentUserGoogle !== null;
+
     const dispatch = useAppDispatch();
 
     useEffect(() => {
@@ -80,7 +88,6 @@ const Profile = () => {
             console.log(error);
         }
     };
-    console.log('USER', user.currentUserGoogle);
 
     const handleDeleteUser = () => {
         try {
@@ -90,8 +97,13 @@ const Profile = () => {
         }
     };
 
-    const checkIsLoginGoogle = user.currentUserGoogle !== null;
-    console.log('checkIsLoginGoogle', checkIsLoginGoogle);
+    const handleSignOut = async () => {
+        try {
+            dispatch(signOutUser());
+        } catch (error) {
+            console.log();
+        }
+    };
 
     return (
         <div className="p-3 max-w-lg mx-auto">
@@ -177,7 +189,12 @@ const Profile = () => {
                 >
                     Delete account
                 </span>
-                <span className="text-red-700 cursor-pointer">Sign out</span>
+                <span
+                    onClick={handleSignOut}
+                    className="text-red-700 cursor-pointer"
+                >
+                    Sign out
+                </span>
             </div>
             <p className="text-red-700 mt-5">
                 {user.error ? <span>{user.error}</span> : ''}

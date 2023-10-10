@@ -66,6 +66,20 @@ export const deleteUser = createAsyncThunk(
     }
 );
 
+export const signOutUser = createAsyncThunk(
+    'user/signOutuser',
+    async (_, thunkAPI) => {
+        try {
+            const res = axios.get('/api/auth/signOut');
+            console.log('RES SIGNOUT', res);
+
+            return res;
+        } catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response.data.message);
+        }
+    }
+);
+
 type UserState = {
     currentUserDatabase: object | null;
     currentUserGoogle: object | null;
@@ -157,10 +171,28 @@ const userSlice = createSlice({
             state.error = null;
             state.currentUserDatabase = null;
             state.currentUserGoogle = null;
+            state.loginMethod = null;
             state.loading = false;
         });
         builder.addCase(
             deleteUser.rejected,
+            (state, action: PayloadAction<any>) => {
+                state.error = action.payload;
+                state.loading = false;
+            }
+        );
+        builder.addCase(signOutUser.pending, state => {
+            state.loading = true;
+        });
+        builder.addCase(signOutUser.fulfilled, state => {
+            state.error = null;
+            state.currentUserDatabase = null;
+            state.currentUserGoogle = null;
+            state.loginMethod = null;
+            state.loading = false;
+        });
+        builder.addCase(
+            signOutUser.rejected,
             (state, action: PayloadAction<any>) => {
                 state.error = action.payload;
                 state.loading = false;
