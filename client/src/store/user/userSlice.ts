@@ -54,6 +54,18 @@ export const updateUser = createAsyncThunk(
     }
 );
 
+export const deleteUser = createAsyncThunk(
+    'user/deleteUser',
+    async (id: number, thunkAPI) => {
+        try {
+            const res = await axios.delete(`/api/user/delete/${id}`);
+            return res.data;
+        } catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response.data.message);
+        }
+    }
+);
+
 type UserState = {
     currentUserDatabase: object | null;
     currentUserGoogle: object | null;
@@ -136,6 +148,22 @@ const userSlice = createSlice({
                 state.error = action.payload;
                 state.loading = false;
                 state.loginMethod = null;
+            }
+        );
+        builder.addCase(deleteUser.pending, state => {
+            state.loading = true;
+        });
+        builder.addCase(deleteUser.fulfilled, state => {
+            state.error = null;
+            state.currentUserDatabase = null;
+            state.currentUserGoogle = null;
+            state.loading = false;
+        });
+        builder.addCase(
+            deleteUser.rejected,
+            (state, action: PayloadAction<any>) => {
+                state.error = action.payload;
+                state.loading = false;
             }
         );
     },

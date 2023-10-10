@@ -1,5 +1,5 @@
 import { useAppSelector, useAppDispatch } from '../store';
-import { updateUser, userSelector } from '../store/user/userSlice';
+import { deleteUser, updateUser, userSelector } from '../store/user/userSlice';
 import React, { useRef, useState, useEffect } from 'react';
 import {
     getDownloadURL,
@@ -76,6 +76,15 @@ const Profile = () => {
                 })
             );
             setUpdateSuccess(true);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+    console.log('USER', user.currentUserGoogle);
+
+    const handleDeleteUser = () => {
+        try {
+            dispatch(deleteUser(user.currentUserDatabase._id));
         } catch (error) {
             console.log(error);
         }
@@ -162,7 +171,10 @@ const Profile = () => {
                 </button>
             </form>
             <div className="flex justify-between mt-5">
-                <span className="text-red-700 cursor-pointer">
+                <span
+                    onClick={handleDeleteUser}
+                    className="text-red-700 cursor-pointer"
+                >
                     Delete account
                 </span>
                 <span className="text-red-700 cursor-pointer">Sign out</span>
