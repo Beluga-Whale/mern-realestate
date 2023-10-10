@@ -14,6 +14,7 @@ import {
 } from 'firebase/storage';
 import { app } from '../firebase';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 export type User = {
     currentUserGoogle?: {
@@ -181,6 +182,12 @@ const Profile = () => {
                 >
                     {user.loading ? 'Loading...' : 'Update'}
                 </button>
+                <Link
+                    className="bg-green-700 text-center text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80"
+                    to="/create-listing"
+                >
+                    Create Listing
+                </Link>
             </form>
             <div className="flex justify-between mt-5">
                 <span
