@@ -180,9 +180,14 @@ const Listing = () => {
             });
 
             setLoading(false);
-            console.log(res.data);
-
-            navigate(`/lising/${res.data._id}`);
+            if (res.statusText === 'OK') {
+                navigate(
+                    `/listing/${
+                        currentUser?.currentUserDatabase?._id ||
+                        currentUser?.currentUserGoogle?._id
+                    }`
+                );
+            }
         } catch (error: any) {
             setError(error);
         }
