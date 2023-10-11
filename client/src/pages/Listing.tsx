@@ -181,12 +181,7 @@ const Listing = () => {
 
             setLoading(false);
             if (res.statusText === 'OK') {
-                navigate(
-                    `/listing/${
-                        currentUser?.currentUserDatabase?._id ||
-                        currentUser?.currentUserGoogle?._id
-                    }`
-                );
+                navigate(`/listing/${res.data._id}`);
             }
         } catch (error: any) {
             setError(error);
