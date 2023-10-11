@@ -27,14 +27,14 @@ export const loginWithGoogle = createAsyncThunk(
             const auth = getAuth(app);
 
             const result = await signInWithPopup(auth, provider);
-            console.log('GOOGLE', result.user);
-            await axios.post('/api/auth/google', {
+            console.log('GOOGLE', result.user.photoURL);
+            const res = await axios.post('/api/auth/google', {
                 name: result.user.displayName,
                 email: result.user.email,
                 photo: result.user.photoURL,
             });
             window.closed;
-            return result.user;
+            return res.data;
         } catch (err: any) {
             return thunkAPI.rejectWithValue(err.response.data.message);
         }

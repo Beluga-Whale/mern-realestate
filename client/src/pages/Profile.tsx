@@ -17,9 +17,10 @@ import { Link } from 'react-router-dom';
 
 export type User = {
     currentUserGoogle?: {
-        photoURL?: string;
-        displayName?: string;
+        avatar?: string;
+        username?: string;
         email?: string;
+        _id: string;
     };
     currentUserDatabase?: any;
     loading: boolean;
@@ -125,7 +126,7 @@ const Profile = () => {
                     className="rounded-full h-24 w-24 object-cover cursor-pointer self-center mt-2"
                     src={
                         formData.avatar ||
-                        user?.currentUserGoogle?.photoURL ||
+                        user?.currentUserGoogle?.avatar ||
                         user?.currentUserDatabase?.avatar
                     }
                     alt="profile"
@@ -148,7 +149,7 @@ const Profile = () => {
                     placeholder="username"
                     id="username"
                     defaultValue={
-                        user?.currentUserGoogle?.displayName ||
+                        user?.currentUserGoogle?.username ||
                         user?.currentUserDatabase?.username
                     }
                     className="border p-3 rounded-lg"

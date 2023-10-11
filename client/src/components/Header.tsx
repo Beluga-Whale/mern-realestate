@@ -5,7 +5,7 @@ import { userSelector } from '../store/user/userSlice';
 
 type User = {
     currentUserGoogle?: {
-        photoURL?: string;
+        avatar?: string;
     };
     currentUserDatabase?: any;
 };
@@ -47,7 +47,7 @@ const Header = () => {
                             <img
                                 className="w-7 h-7 rounded-full object-cover "
                                 src={
-                                    user?.currentUserGoogle?.photoURL ||
+                                    user?.currentUserGoogle?.avatar ||
                                     user?.currentUserDatabase?.avatar
                                 }
                                 alt=""
