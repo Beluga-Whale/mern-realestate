@@ -322,22 +322,24 @@ const Listing = () => {
                                 <p className="text-xs">($ / month)</p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <input
-                                className="p-3 border border-gray-300 rounded-lg"
-                                type="number"
-                                id="discountPrice"
-                                min={0}
-                                max={100000}
-                                required
-                                onChange={handleChange}
-                                value={formData.discountPrice}
-                            />
-                            <div className="flex flex-col items-center">
-                                <p>Discounted price</p>
-                                <p className=" text-xs">($ / month)</p>
+                        {formData.offer && (
+                            <div className="flex items-center gap-2">
+                                <input
+                                    className="p-3 border border-gray-300 rounded-lg"
+                                    type="number"
+                                    id="discountPrice"
+                                    min={0}
+                                    max={100000}
+                                    required
+                                    onChange={handleChange}
+                                    value={formData.discountPrice}
+                                />
+                                <div className="flex flex-col items-center">
+                                    <p>Discounted price</p>
+                                    <p className=" text-xs">($ / month)</p>
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 </div>
                 <div className="flex flex-col flex-1 gap-4">
