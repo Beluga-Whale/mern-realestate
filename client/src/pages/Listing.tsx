@@ -18,6 +18,7 @@ import {
 } from 'react-icons/fa';
 import { userSelector } from '../store/user/userSlice';
 import { User } from './Profile';
+import Contact from '../components/Contact';
 const Listing = () => {
     SwiperCore.use([Navigation]);
     const { id } = useParams();
@@ -40,6 +41,10 @@ const Listing = () => {
         };
         fetchListing();
     }, []);
+    const checkUser =
+        user.currentUserDatabase?._id || user.currentUserGoogle?._id;
+    console.log('checkUser', checkUser);
+
     return (
         <main>
             {loading && <p className="text-center my-7 text-2xl">Loading...</p>}
@@ -136,19 +141,15 @@ const Listing = () => {
                                     : 'Unfurnished'}
                             </li>
                         </ul>
-                        {user &&
-                            listing.userRef !==
-                                (user.currentUserDatabase?._id ||
-                                    user.currentUserGoogle?._id) &&
-                            !contact && (
-                                <button
-                                    onClick={() => setContact(true)}
-                                    className="bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 p-3"
-                                >
-                                    Contact landlord
-                                </button>
-                            )}
-                        {/* {contact && <Contact listing={listing} />} */}
+                        {user && listing.userRef !== checkUser && !contact && (
+                            <button
+                                onClick={() => setContact(true)}
+                                className="bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 p-3"
+                            >
+                                Contact landlord
+                            </button>
+                        )}
+                        {contact && <Contact listing={listing} />}
                     </div>
                 </div>
             )}
