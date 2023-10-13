@@ -25,6 +25,7 @@ export type FormData = {
     offer: boolean;
     parking: boolean;
     furnished: boolean;
+    userRef?: string;
 };
 
 const CreateListing = () => {
