@@ -13,6 +13,7 @@ import { User } from './Profile';
 import { useNavigate } from 'react-router-dom';
 
 export type FormData = {
+    _id?: string;
     imageUrls: string[];
     name: string;
     description: string;

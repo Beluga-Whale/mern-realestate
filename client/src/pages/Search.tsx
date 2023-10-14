@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FormData } from './CreateListing';
 import axios from 'axios';
+import ListingItem from '../components/ListingItem';
 
 type SideBarData = {
     searchTerm: string;
@@ -25,7 +26,7 @@ const Search = () => {
         order: 'desc',
     });
     const [loading, setLoading] = useState<boolean>(false);
-    const [listings, setListings] = useState<FormData>();
+    const [listings, setListings] = useState<FormData[]>([]);
 
     useEffect(() => {
         const urlParams = new URLSearchParams(location.search);
@@ -230,6 +231,24 @@ const Search = () => {
                 <h1 className="text-3xl font-semibold border-b p-3 text-slate-700 mt-5 ">
                     Listing Result:
                 </h1>
+                <div className="p-7 flex flex-wrap gap-4">
+                    {!loading && listings === null && (
+                        <p className="text-xl text-slate-700  ">
+                            No listing found!
+                        </p>
+                    )}
+                    {loading && (
+                        <p className="text-xl text-slate-700 text-center ">
+                            Loading....
+                        </p>
+                    )}
+
+                    {!loading &&
+                        listings &&
+                        listings.map((listing: any) => (
+                            <ListingItem key={listing._id} listing={listing} />
+                        ))}
+                </div>
             </div>
         </div>
     );
