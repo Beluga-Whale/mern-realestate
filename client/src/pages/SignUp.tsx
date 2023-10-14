@@ -29,6 +29,7 @@ const SignUp = () => {
         }
         setLoading(false);
     };
+    console.log(error);
 
     return (
         <div className="p-3 max-w-lg mx-auto">
